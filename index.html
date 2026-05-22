@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARCHITECT OS — LEVIATHAN MISSION CONTROL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { mono: ['"JetBrains Mono"', 'monospace'] },
+          colors: {
+             luxuryGold: '#e8b84b',
+             goldHover: '#fdf5d2',
+             goldMuted: '#b8902e',
+             luxuryBlack: '#000000',
+             cardBg: 'rgba(11, 9, 12, 0.65)',
+             cardBorder: 'rgba(46, 38, 30, 0.4)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Global Overrides */
+    body {
+      background: #000000;
+      color: #d1c7b7;
+      overflow-x: hidden;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: #2e261e; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #e8b84b; }
+
+    /* Bespoke Premium Metallic Slider Architecture */
+    .luxury-gold-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    .luxury-gold-slider::-webkit-slider-runnable-track {
+      height: 3px;
+      background: linear-gradient(90deg, #2e210b, #e8b84b, #fdf5d2, #b8902e);
+      border-radius: 9px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+    }
+    .luxury-gold-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 14px; width: 14px;
+      background: radial-gradient(circle at 35% 35%, #fff6d5, #e8b84b, #705313);
+      border-radius: 50%;
+      margin-top: -5px;
+      border: 1px solid #fdf5d2;
+      box-shadow: 0 0 10px rgba(232, 184, 75, 0.8), 0 2px 4px rgba(0,0,0,0.5);
+      transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .luxury-gold-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+    .luxury-gold-slider:focus { outline: none; }
+
+    /* HUD Glow States */
+    .gold-glow {
+      box-shadow: 0 0 25px rgba(232, 184, 75, 0.15);
+    }
+    .text-glow {
+      text-shadow: 0 0 12px rgba(232, 184, 75, 0.4);
+    }
+
+    /* Keyframe Micro-Animations */
+    @keyframes panicPulse {
+      0% { border-color: rgba(46, 38, 30, 0.4); box-shadow: 0 0 0px rgba(255,48,88,0); background: rgba(11, 9, 12, 0.65); }
+      50% { border-color: #ff3058; box-shadow: 0 0 30px rgba(255,48,88,0.25); background: rgba(25, 4, 8, 0.8); }
+      100% { border-color: rgba(46, 38, 30, 0.4); box-shadow: 0 0 0px rgba(255,48,88,0); background: rgba(11, 9, 12, 0.65); }
+    }
+    .panic-active { animation: panicPulse 1.2s infinite ease-in-out; }
+
+    @keyframes textScan {
+      0% { opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { opacity: 0.3; }
+    }
+    .scanline { animation: textScan 3s infinite ease-in-out; }
+    
+    /* Interactive Glassmorphism */
+    .glass-panel {
+      background: rgba(10, 8, 11, 0.7);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(46, 38, 30, 0.4);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .glass-panel:hover {
+      border-color: rgba(232, 184, 75, 0.3);
+    }
+  </style>
+</head>
+<body class="font-mono text-sm antialiased selection:bg-luxuryGold selection:text-black">
+
+  <div id="boot-screen" class="fixed inset-0 bg-black z-50 flex flex-col justify-between p-8 select-none transition-opacity duration-700 ease-out">
+    <div id="boot-terminal" class="text-xs text-luxuryGold/60 space-y-1 max-w-3xl leading-relaxed"></div>
+    <div class="flex justify-between items-center border-t border-white/5 pt-4">
+      <div class="text-xs tracking-[0.3em] text-white/20">SYSTEM INITIALIZATION PROTOCOL</div>
+      <button onclick="dismissBoot()" id="boot-btn" class="opacity-0 transition-opacity duration-500 bg-luxuryGold hover:bg-goldHover text-black font-bold px-6 py-2 rounded text-xs tracking-widest cursor-pointer shadow-[0_0_15px_rgba(232,184,75,0.4)]">INITIALIZE CONSOLE</button>
+    </div>
+  </div>
+
+  <div class="min-h-screen p-5 flex flex-col box-border">
+    
+    <header class="flex justify-between items-center border-b border-cardBorder pb-4 mb-5">
+      <div class="flex items-center gap-4">
+        <div>
+          <span class="text-[10px] text-goldMuted tracking-[0.4em] font-bold block scanline">LEVIATHAN // OPERATING SYSTEM</span>
+          <h1 class="text-xl font-bold text-luxuryGold tracking-wider text-glow">ARCHITECT OS <span class="text-xs text-white/20 font-normal ml-2">v4.2.1</span></h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="hidden lg:flex gap-4 text-[10px] text-white/30 border-r border-cardBorder pr-6">
+          <div><kbd class="bg-white/5 border border-white/10 px-1 py-0.5 rounded text-white/60">SPACE</kbd> TMR PLAY</div>
+          <div><kbd class="bg-white/5 border border-white/10 px-1 py-0.5 rounded text-white/60">ESC</kbd> PURGE</div>
+          <div><kbd class="bg-white/5 border border-white/10 px-1 py-0.5 rounded text-white/60">1-3</kbd> AUDIO</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-[9px] text-white/40 tracking-wider">ACTIVE MASK:</span>
+          <select id="mask-selector" onchange="handleMaskChange(this.value)" class="bg-[#110e13] border border-cardBorder text-luxuryGold font-medium text-xs px-3 py-1.5 rounded focus:outline-none focus:border-luxuryGold transition-colors cursor-pointer"></select>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-[280px_1fr_310px] gap-5 flex-1 min-h-[0]">
+      
+      <div class="flex flex-col gap-5">
+        <div class="glass-panel rounded-lg p-4 flex flex-col">
+          <span class="text-[9px] font-bold tracking-[0.25em] text-white/30 mb-4 block">// AUDIO MATRIX</span>
+          <div id="audio-container" class="space-y-3"></div>
+        </div>
+
+        <div class="glass-panel rounded-lg p-4 flex-1 flex flex-col min-h-[180px]">
+          <span class="text-[9px] font-bold tracking-[0.25em] text-white/30 mb-3 block">// SOCIAL EXPEDITION MATRIX</span>
+          <div id="mask-log" class="text-[10px] text-white/40 space-y-2 flex-1 overflow-y-auto pr-1 leading-relaxed">
+            <div class="text-goldMuted/50 italic">// Awaiting active mask rotation telemetry...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-panel rounded-lg p-6 flex flex-col items-center justify-center relative min-h-[400px]">
+        <div class="absolute top-4 left-4">
+          <span id="system-health-label" class="text-[8px] text-white/30 tracking-widest block mb-1">SYSTEM OUTPUT CAPACITY</span>
+          <div class="w-32 bg-white/5 h-1 rounded-full overflow-hidden border border-white/5">
+            <div id="system-health-bar" class="bg-gradient-to-r from-goldMuted to-luxuryGold h-full w-full transition-all duration-1000"></div>
+          </div>
+        </div>
+        
+        <span class="text-[9px] font-bold tracking-[0.3em] text-white/30 mb-6 block">// TACTICAL EXECUTION ENVIRONMENT</span>
+        
+        <div class="flex gap-2.5 mb-8" id="preset-controls"></div>
+
+        <div class="relative w-72 h-72 flex items-center justify-center">
+          <svg width="288" height="288" class="absolute transform -rotate-90">
+            <circle cx="144" cy="144" r="120" fill="none" stroke="#0e0c0f" stroke-width="6" />
+            <circle cx="144" cy="144" r="106" fill="none" stroke="#060507" stroke-width="1" stroke-dasharray="4 4" />
+            
+            <circle id="hud-timer-ring" cx="144" cy="144" r="120" fill="none" stroke="#e8b84b" stroke-width="6" stroke-linecap="round" stroke-dasharray="753.98" stroke-dashoffset="0" class="transition-all duration-300 ease-linear" />
+            <circle id="hud-inner-ring" cx="144" cy="144" r="106" fill="none" stroke="#b8902e" stroke-width="2" stroke-dasharray="666" stroke-dashoffset="0" opacity="0.3" class="transition-all duration-700 ease-out" />
+          </svg>
+          
+          <div class="text-center z-10 flex flex-col items-center select-none">
+            <div id="hud-time-display" class="text-5xl font-bold font-mono text-luxuryGold tracking-tighter text-glow">50:00</div>
+            <div id="hud-phase-display" class="text-[9px] font-bold tracking-[0.4em] text-white/30 mt-2">STANDBY</div>
+          </div>
+        </div>
+
+        <div class="mt-8 flex items-center gap-4">
+          <button id="main-timer-toggle" onclick="toggleMainTimer()" class="bg-luxuryGold hover:bg-goldHover text-black font-bold text-xs tracking-[0.2em] px-10 py-3 rounded transition-all duration-200 cursor-pointer shadow-[0_0_20px_rgba(232,184,75,0.2)] hover:shadow-[0_0_25px_rgba(232,184,75,0.4)]">ENGAGE</button>
+          <button onclick="resetMainTimer()" class="border border-cardBorder hover:border-white/20 text-white/40 hover:text-white/80 font-bold text-xs tracking-widest px-5 py-3 rounded transition-colors cursor-pointer">RESET</button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-5">
+        <div id="crisis-card" class="glass-panel rounded-lg p-4 transition-all duration-300">
+          <span class="text-[9px] font-bold tracking-[0.25em] text-white/30 mb-4 block">// MANUFACTURED CRISIS SIMULATOR</span>
+          
+          <div class="flex items-center justify-between mb-4">
+            <div class="relative w-20 h-20 flex items-center justify-center">
+              <svg width="80" height="80" class="absolute transform -rotate-90">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#0f0d12" stroke-width="3" />
+                <circle id="crisis-ring" cx="40" cy="40" r="34" fill="none" stroke="#e8b84b" stroke-width="3" stroke-linecap="round" stroke-dasharray="213.62" stroke-dashoffset="0" />
+              </svg>
+              <span id="crisis-time-display" class="text-xs font-bold text-luxuryGold font-mono">10:00</span>
+            </div>
+            <div class="flex-1 pl-4 space-y-1">
+              <div class="text-[8px] text-white/30 tracking-wider">MODULATED LIMIT</div>
+              <div id="crisis-slider-value" class="text-sm font-bold text-white/80">10 MINUTES</div>
+            </div>
+          </div>
+
+          <input id="crisis-slider" type="range" min="1" max="20" value="10" oninput="updateCrisisDuration(this.value)" class="luxury-gold-slider w-full mb-4">
+          <button id="crisis-btn" onclick="toggleCrisisTimer()" class="w-full bg-transparent border border-luxuryGold/40 hover:border-luxuryGold text-luxuryGold text-[10px] font-bold tracking-widest py-2 rounded transition-all cursor-pointer">ARM CRISIS WAVE</button>
+        </div>
+
+        <div class="glass-panel rounded-lg p-4 flex-1 flex flex-col gap-4">
+          <div class="flex-1 flex flex-col">
+            <span class="text-[9px] font-bold tracking-[0.25em] text-white/30 mb-2 block">// EMOTIONAL SYSTOLIC VENT VALVE</span>
+            <textarea id="vent-valve" oninput="saveTextData('vent', this.value)" placeholder="External parsing layer. Type freely. Data will not dump to secondary drives unless provoked." class="w-full flex-1 bg-[#09070a] border border-cardBorder rounded text-white/80 text-xs p-2.5 font-mono resize-none focus:outline-none focus:border-luxuryGold/40 transition-colors leading-relaxed"></textarea>
+          </div>
+          
+          <div class="flex-1 flex flex-col">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-[9px] font-bold tracking-[0.25em] text-white/30 block">// 80% RETENTION & COMPLETION AUDIT</span>
+              <button onclick="clearAuditLog()" class="text-[8px] text-white/20 hover:text-white/50 tracking-tighter">CLEAR INTERFACE</button>
+            </div>
+            <textarea id="audit-log" oninput="saveTextData('audit', this.value)" placeholder="Isolate variables causing termination drag. Document precisely why you are under-stimulated." class="w-full flex-1 bg-[#09070a] border border-cardBorder rounded text-white/80 text-xs p-2.5 font-mono resize-none focus:outline-none focus:border-luxuryGold/40 transition-colors leading-relaxed"></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="yt-hardware-vault" class="hidden"></div>
+
+  <script>
+    // System Constant Registry
+    const PRESETS = [
+      { label: "DEEP WORK", work: 50, rest: 10, mode: "ALPHA" },
+      { label: "SPRINTS", work: 25, rest: 5, mode: "GLITCH" }
+    ];
+
+    const MASKS = [
+      "01 — COLD / CALCULATED",
+      "02 — FUNNY / ENGAGED",
+      "03 — GOOFY / SMART",
+      "04 — FRIENDLY EMISSARY",
+      "05 — SELFLESS COMPASSION",
+      "06 — OVERCONFIDENT THREAT",
+      "07 — SHY / INCONSPICUOUS"
+    ];
+
+    const TRACKS = [
+      { id: "1_G60OdEzXs", title: "FOCUS ALPHA", sub: "Pure 40Hz Gamma Frequency Generator" },
+      { id: "yA41iunMG6A", title: "BOREDOM GLITCH", sub: "Coding Stupor — Rhythmic Engagement Loop" },
+      { id: "zDk8pVOtiVY", title: "SYSTEM DRAG", sub: "Organic Pink Noise — Cortisol Down-Regulator" }
+    ];
+
+    // Core System State
+    let state = {
+      presetIdx: 0,
+      phase: 'work', // 'work' or 'rest'
+      timerRunning: false,
+      mainElapsed: 0,
+      
+      crisisMins: 10,
+      crisisRunning: false,
+      crisisElapsed: 0,
+      
+      activeMask: 0,
+      maskHistory: []
+    };
+
+    // Intervals Global Register
+    let mainInterval = null;
+    let crisisInterval = null;
+    let isYTApiLoaded = false;
+    let playerMap = {};
+
+    // Base Math Vectors
+    const MAIN_CIRCUMFERENCE = 2 * Math.PI * 120; // 753.98
+    const CRISIS_CIRCUMFERENCE = 2 * Math.PI * 34; // 213.62
+
+    // Initialize Subsystem
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStateFromLocalStorage();
+      buildTerminalSequence();
+      buildUIElements();
+      injectAudioIframes();
+      setupGlobalKeybinds();
+      syncUI();
+    });
+
+    // Emulated Boot Architecture
+    function buildTerminalSequence() {
+      const lines = [
+        "BOOTING LEVIATHAN CORE PROTOCOLS v4.2.1...",
+        "DECRYPTING ARCHITECT PROFILE (INTJ CACHE VALID)...",
+        "ESTABLISHING SECURE CONNECTION ON PORT 40HZ...",
+        "HARDWARE ACCELERATION ACCESSED SUCESSFULLY.",
+        "SYNCHRONIZING AUDIO CHANNELS WITH YOUTUBE NETWORKS...",
+        "CALIBRATING 7-MASK ARRAY SOCIAL ENGINES...",
+        "DEPLOYING MANUFACTURED CRISIS MODULATOR OVERCLOCK LAYER...",
+        "SYSTEM HEALTH NOMINAL. ALL SHIELDS INTEGRATED.",
+        "READY FOR OPERATION COMMANDER."
+      ];
+      const term = document.getElementById("boot-terminal");
+      let currentLine = 0;
+
+      function printLine() {
+        if (currentLine < lines.length) {
+          const div = document.createElement("div");
+          div.className = "mb-1";
+          div.textContent = `> ${lines[currentLine]}`;
+          term.appendChild(div);
+          currentLine++;
+          setTimeout(printLine, Math.random() * 150 + 80);
+        } else {
+          document.getElementById("boot-btn").style.opacity = "1";
+        }
+      }
+      setTimeout(printLine, 300);
+    }
+
+    function dismissBoot() {
+      const b = document.getElementById("boot-screen");
+      b.style.opacity = "0";
+      setTimeout(() => b.remove(), 700);
+    }
+
+    // Assembly Matrix UI
+    function buildUIElements() {
+      // Build Masks Dropdown List
+      const select = document.getElementById("mask-selector");
+      select.innerHTML = MASKS.map((m, i) => `<option value="${i}" ${state.activeMask === i ? 'selected' : ''}>${m}</option>`).join('');
+
+      // Build Main Preset Buttons
+      const pControls = document.getElementById("preset-controls");
+      pControls.innerHTML = PRESETS.map((p, i) => `
+        <button id="preset-btn-${i}" onclick="switchPreset(${i})" class="px-5 py-2 rounded text-[10px] font-bold tracking-widest transition-all duration-300 cursor-pointer border ${
+          state.presetIdx === i 
+          ? 'bg-luxuryGold text-black border-luxuryGold font-bold shadow-[0_0_15px_rgba(232,184,75,0.2)]' 
+          : 'bg-transparent text-white/30 border-cardBorder hover:border-white/10 hover:text-white/60'
+        }">${p.label}</button>
+      `).join('');
+
+      // Build Audio Cards
+      const aContainer = document.getElementById("audio-container");
+      aContainer.innerHTML = TRACKS.map((t) => `
+        <div id="card-audio-${t.id}" class="bg-[#110e13] border border-cardBorder rounded-md p-3 transition-all duration-300">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div id="lbl-audio-${t.id}" class="text-[9px] font-bold tracking-wider text-white/60 transition-colors">${t.title}</div>
+              <div class="text-[7px] text-white/20 mt-0.5">${t.sub}</div>
+            </div>
+            <button id="btn-audio-${t.id}" onclick="toggleAudioTrack('${t.id}')" class="w-7 h-7 rounded-full border border-cardBorder text-[9px] flex items-center justify-center transition-all bg-transparent text-white/40 hover:text-white/90 cursor-pointer">▶</button>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-[7px] text-white/20 font-bold tracking-widest w-6">VOL</span>
+            <input type="range" min="0" max="100" value="50" oninput="changeAudioVolume('${t.id}', this.value)" class="luxury-gold-slider flex-1">
+            <span id="vol-txt-${t.id}" class="text-[7px] font-mono text-goldMuted w-4 text-right">50</span>
+          </div>
+        </div>
+      `).join('');
+
+      // Restore Cached User Strings
+      document.getElementById("vent-valve").value = localStorage.getItem("architect_vent") || "";
+      document.getElementById("audit-log").value = localStorage.getItem("architect_audit") || "";
+    }
+
+    // Hardware Audio Injector Layer
+    function injectAudioIframes() {
+      const vault = document.getElementById("yt-hardware-vault");
+      TRACKS.forEach(t => {
+        const iframe = document.createElement("iframe");
+        iframe.id = `iframe-${t.id}`;
+        iframe.src = `https://www.youtube.com/embed/${t.id}?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=${t.id}`;
+        iframe.allow = "autoplay";
+        vault.appendChild(iframe);
+      });
+    }
+
+    // Post-Message Interface to YouTube Embedded Players
+    function executeAudioCommand(id, func, args = []) {
+      const frame = document.getElementById(`iframe-${id}`);
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage(JSON.stringify({
+          event: "command",
+          func: func,
+          args: args
+        }), "*");
+      }
+    }
+
+    function toggleAudioTrack(id) {
+      const card = document.getElementById(`card-audio-${id}`);
+      const btn = document.getElementById(`btn-audio-${id}`);
+      const lbl = document.getElementById(`lbl-audio-${id}`);
+      const isCurrentlyPlaying = card.classList.contains("playing-active");
+
+      // Stop all secondary elements running to preserve cognitive clean space
+      TRACKS.forEach(t => {
+        if (t.id !== id) {
+          document.getElementById(`card-audio-${t.id}`).classList.remove("playing-active", "border-luxuryGold/40");
+          document.getElementById(`card-audio-${t.id}`).style.backgroundColor = "rgba(17,14,19,1)";
+          document.getElementById(`btn-audio-${t.id}`).textContent = "▶";
+          document.getElementById(`btn-audio-${t.id}`).classList.remove("bg-luxuryGold", "text-black", "border-luxuryGold", "shadow-[0_0_12px_rgba(232,184,75,0.4)]");
+          document.getElementById(`lbl-audio-${t.id}`).classList.remove("text-luxuryGold");
+          executeAudioCommand(t.id, "pauseVideo");
+        }
+      });
+
+      if (isCurrentlyPlaying) {
+        card.classList.remove("playing-active", "border-luxuryGold/40");
+        card.style.backgroundColor = "rgba(17,14,19,1)";
+        btn.textContent = "▶";
+        btn.classList.remove("bg-luxuryGold", "text-black", "border-luxuryGold", "shadow-[0_0_12px_rgba(232,184,75,0.4)]");
+        lbl.classList.remove("text-luxuryGold");
+        executeAudioCommand(id, "pauseVideo");
+      } else {
+        card.classList.add("playing-active", "border-luxuryGold/40");
+        card.style.backgroundColor = "rgba(232,184,75,0.03)";
+        btn.textContent = "■";
+        btn.classList.add("bg-luxuryGold", "text-black", "border-luxuryGold", "shadow-[0_0_12px_rgba(232,184,75,0.4)]");
+        lbl.classList.add("text-luxuryGold");
+        executeAudioCommand(id, "playVideo");
+      }
+    }
+
+    function changeAudioVolume(id, vol) {
+      document.getElementById(`vol-txt-${id}`).textContent = vol;
+      executeAudioCommand(id, "setVolume", [vol]);
+    }
+
+    // Engine Core Synchronization (Timers)
+    function syncUI() {
+      // Config calculations
+      const totalMainSeconds = (state.phase === 'work' ? PRESETS[state.presetIdx].work : PRESETS[state.presetIdx].rest) * 60;
+      const mainRemaining = Math.max(0, totalMainSeconds - state.mainElapsed);
+      
+      // Update Text Displays
+      document.getElementById("hud-time-display").textContent = formatClock(mainRemaining);
+      const phaseDisplay = document.getElementById("hud-phase-display");
+      phaseDisplay.textContent = state.timerRunning ? state.phase.toUpperCase() : "STANDBY";
+      phaseDisplay.style.color = state.timerRunning ? (state.phase === 'work' ? '#e8b84b' : '#c4824a') : 'rgba(255,255,255,0.3)';
+
+      // Sync Ring Geometry Architecture
+      const mainPct = Math.min(1, state.mainElapsed / totalMainSeconds);
+      const mainRing = document.getElementById("hud-timer-ring");
+      mainRing.style.strokeDashoffset = MAIN_CIRCUMFERENCE * mainPct;
+      mainRing.style.stroke = state.phase === 'work' ? '#e8b84b' : '#c4824a';
+      
+      const innerRing = document.getElementById("hud-inner-ring");
+      innerRing.style.strokeDashoffset = (MAIN_CIRCUMFERENCE) * (state.mainElapsed / totalMainSeconds) * 0.5;
+
+      // Update Dynamic Output Metrics UI
+      const healthBar = document.getElementById("system-health-bar");
+      const healthPct = ((totalMainSeconds - state.mainElapsed) / totalMainSeconds) * 100;
+      healthBar.style.width = `${healthPct}%`;
+
+      const playBtn = document.getElementById("main-timer-toggle");
+      if (state.timerRunning) {
+        playBtn.textContent = "HALT";
+        playBtn.classList.add("bg-goldMuted");
+      } else {
+        playBtn.textContent = "ENGAGE";
+        playBtn.classList.remove("bg-goldMuted");
+      }
+
+      // Sync Modulated Crisis Interface Elements
+      const totalCrisisSeconds = state.crisisMins * 60;
+      const crisisRemaining = Math.max(0, totalCrisisSeconds - state.crisisElapsed);
+      document.getElementById("crisis-time-display").textContent = formatClock(crisisRemaining);
+      
+      const crisisPct = Math.min(1, state.crisisElapsed / totalCrisisSeconds);
+      document.getElementById("crisis-ring").style.strokeDashoffset = CRISIS_CIRCUMFERENCE * crisisPct;
+
+      const crisisCard = document.getElementById("crisis-card");
+      const crisisBtn = document.getElementById("crisis-btn");
+      const isPanicState = state.crisisRunning && crisisRemaining <= 60 && crisisRemaining > 0;
+
+      if (isPanicState) {
+        crisisCard.classList.add("panic-active");
+        document.getElementById("crisis-ring").style.stroke = "#ff3058";
+        document.getElementById("crisis-time-display").style.color = "#ff3058";
+      } else {
+        crisisCard.classList.remove("panic-active");
+        document.getElementById("crisis-ring").style.stroke = "#e8b84b";
+        document.getElementById("crisis-time-display").style.color = "#e8b84b";
+      }
+
+      if (state.crisisRunning) {
+        crisisBtn.textContent = "ABORT CRISIS";
+        crisisBtn.classList.add("bg-red-900/20", "border-red-500", "text-red-400");
+      } else {
+        crisisBtn.textContent = "ARM CRISIS WAVE";
+        crisisBtn.classList.remove("bg-red-900/20", "border-red-500", "text-red-400");
+      }
+    }
+
+    function toggleMainTimer() {
+      state.timerRunning = !state.timerRunning;
+      if (state.timerRunning) {
+        mainInterval = setInterval(() => {
+          const totalMainSeconds = (state.phase === 'work' ? PRESETS[state.presetIdx].work : PRESETS[state.presetIdx].rest) * 60;
+          state.mainElapsed++;
+          if (state.mainElapsed >= totalMainSeconds) {
+            state.phase = state.phase === 'work' ? 'rest' : 'work';
+            state.mainElapsed = 0;
+            triggerNervousSystemBuzzer();
+          }
+          syncUI();
+          saveStateToLocalStorage();
+        }, 1000);
+      } else {
+        clearInterval(mainInterval);
+        syncUI();
+        saveStateToLocalStorage();
+      }
+    }
+
+    function resetMainTimer() {
+      clearInterval(mainInterval);
+      state.timerRunning = false;
+      state.mainElapsed = 0;
+      state.phase = 'work';
+      syncUI();
+      saveStateToLocalStorage();
+    }
+
+    function switchPreset(idx) {
+      state.presetIdx = idx;
+      // Re-render tactical panels 
+      const pControls = document.getElementById("preset-controls");
+      pControls.querySelectorAll("button").forEach((btn, i) => {
+        if (i === idx) {
+          btn.className = "px-5 py-2 rounded text-[10px] font-bold tracking-widest transition-all duration-300 cursor-pointer border bg-luxuryGold text-black border-luxuryGold shadow-[0_0_15px_rgba(232,184,75,0.2)]";
+        } else {
+          btn.className = "px-5 py-2 rounded text-[10px] font-bold tracking-widest transition-all duration-300 cursor-pointer border bg-transparent text-white/30 border-cardBorder hover:border-white/10 hover:text-white/60";
+        }
+      });
+      resetMainTimer();
+    }
+
+    // Modulated Crisis Framework Subsystem
+    function updateCrisisDuration(v) {
+      state.crisisMins = parseInt(v);
+      state.crisisElapsed = 0;
+      document.getElementById("crisis-slider-value").textContent = `${v} MINUTES`;
+      syncUI();
+    }
+
+    function toggleCrisisTimer() {
+      state.crisisRunning = !state.crisisRunning;
+      if (state.crisisRunning) {
+        crisisInterval = setInterval(() => {
+          const totalCrisisSeconds = state.crisisMins * 60;
+          state.crisisElapsed++;
+          if (state.crisisElapsed >= totalCrisisSeconds) {
+            clearInterval(crisisInterval);
+            state.crisisRunning = false;
+            triggerNervousSystemBuzzer();
+          }
+          syncUI();
+        }, 1000);
+      } else {
+        clearInterval(crisisInterval);
+        state.crisisRunning = false;
+        syncUI();
+      }
+    }
+
+    // Social Camouflage Layer Management
+    function handleMaskChange(val) {
+      state.activeMask = parseInt(val);
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const entryText = `${timestamp} → INITIALIZED: ${MASKS[state.activeMask]}`;
+      
+      state.maskHistory.unshift(entryText);
+      if (state.maskHistory.length > 8) state.maskHistory.pop();
+      
+      const logContainer = document.getElementById("mask-log");
+      logContainer.innerHTML = state.maskHistory.map((h, i) => `
+        <div class="${i === 0 ? 'text-luxuryGold font-medium tracking-wide drop-shadow-[0_0_8px_rgba(232,184,75,0.2)]' : 'text-white/30'}">${h}</div>
+      `).join('');
+      
+      saveStateToLocalStorage();
+    }
+
+    // Text Storage Intercept Layer
+    function saveTextData(key, text) {
+      localStorage.setItem(`architect_${key}`, text);
+    }
+
+    function clearAuditLog() {
+      document.getElementById("audit-log").value = "";
+      localStorage.removeItem("architect_audit");
+    }
+
+    // Power-User Keyboard Optimization
+    function setupGlobalKeybinds() {
+      window.addEventListener('keydown', (e) => {
+        // Safe lock: skip execution if developer is inside an editing buffer matrix
+        if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') {
+          return;
+        }
+
+        const k = e.key.toUpperCase();
+        if (e.key === ' ') {
+          e.preventDefault();
+          toggleMainTimer();
+        } else if (e.key === 'Escape') {
+          resetMainTimer();
+          if (state.crisisRunning) toggleCrisisTimer();
+        } else if (['1', '2', '3'].includes(e.key)) {
+          const trackMap = [TRACKS[0].id, TRACKS[1].id, TRACKS[2].id];
+          toggleAudioTrack(trackMap[parseInt(e.key) - 1]);
+        }
+      });
+    }
+
+    // Auxiliary Utility Architecture
+    function formatClock(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function triggerNervousSystemBuzzer() {
+      // High-end tactical interface sound generation using integrated audio synthesis loops
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, ctx.currentTime); // Precise clear tone
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.4);
+      } catch (e) {
+        // Audio API context fallback
+      }
+    }
+
+    function saveStateToLocalStorage() {
+      localStorage.setItem("architect_state_cache", JSON.stringify({
+        presetIdx: state.presetIdx,
+        phase: state.phase,
+        mainElapsed: state.mainElapsed,
+        crisisMins: state.crisisMins,
+        activeMask: state.activeMask,
+        maskHistory: state.maskHistory
+      }));
+    }
+
+    function loadStateFromLocalStorage() {
+      const raw = localStorage.getItem("architect_state_cache");
+      if (raw) {
+        try {
+          const cached = JSON.parse(raw);
+          state = { ...state, ...cached, timerRunning: false, crisisRunning: false, crisisElapsed: 0 };
+        } catch(e) {}
+      }
+    }
+  </script>
+</body>
+</html>
